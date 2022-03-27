@@ -14,6 +14,10 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity() {
+    companion object{
+        val otpsender = "6505551212";
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -24,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         }
         else{
             receiveMsg()
+
         }
     }
 
@@ -39,17 +44,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun receiveMsg() {
-        var otpsender:String = "6505551212";
         var br = object:BroadcastReceiver(){
             override fun onReceive(p0: Context?, p1: Intent?) {
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
                     for(sms in Telephony.Sms.Intents.getMessagesFromIntent(p1)){
+                        fun String.show() = Toast.makeText(applicationContext, this, Toast.LENGTH_LONG).show()
                         if(otpsender.equals(sms.getOriginatingAddress())){
-                            Toast.makeText(applicationContext,sms.displayMessageBody,Toast.LENGTH_LONG).show()
+                            sms.displayMessageBody.show()
                         }
                         //if문 제대로 들어갔는지 확인용
                         else{
-                            Toast.makeText(applicationContext,sms.getOriginatingAddress() ,Toast.LENGTH_LONG).show()
+                            sms.displayOriginatingAddress.show()
                         }
                     }
                 }
