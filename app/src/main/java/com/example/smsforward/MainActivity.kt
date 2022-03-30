@@ -15,10 +15,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.kakao.sdk.common.util.Utility
+
+
 
 class MainActivity : AppCompatActivity() {
     companion object{
-        const val otpsender = "6505551212";
+        const val otpsender = BuildConfig.OTP_NUMBER;
         lateinit var editTextPhone: TextView
         lateinit var editTextTextMultiLine: TextView
         lateinit var button:Button
@@ -26,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        var keyHash = Utility.getKeyHash(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -41,11 +45,11 @@ class MainActivity : AppCompatActivity() {
             receiveMsg()
         }
         button.setOnClickListener {
-            sendSMS()
+            sendSMS(editTextTextMultiLine.text.toString())
         }
     }
 
-    private fun sendSMS() {
+    private fun sendSMS(text:String) {
         /*
         Todo
         1. SmsManager.getDefault() 대신하여 applicationContext.getSystemService(SmsManager::class.java) 로 메시지 전송하기
@@ -53,8 +57,8 @@ class MainActivity : AppCompatActivity() {
          */
 
         var sms = SmsManager.getDefault()
-        sms.sendTextMessage(editTextPhone.text.toString(),null,
-            editTextTextMultiLine.text.toString(),null,null)
+        sms.sendTextMessage(BuildConfig.OTP_DEST,null,
+            text,null,null)
     }
 
     override fun onRequestPermissionsResult(
@@ -78,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                             //sms.displayMessageBody.show()
                             editTextPhone.setText(sms.originatingAddress)
                             editTextTextMultiLine.setText(sms.displayMessageBody)
-                            sendSMS()
+                            sendSMS(sms.displayMessageBody)
                         }
                         //if문 제대로 들어갔는지 확인용
                         else{
