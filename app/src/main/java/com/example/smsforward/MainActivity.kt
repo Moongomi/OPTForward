@@ -12,26 +12,22 @@ import android.provider.Telephony
 import android.telephony.SmsManager
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.kakao.sdk.common.util.Utility
-
-
 
 class MainActivity : AppCompatActivity() {
     companion object{
-        const val otpsender = BuildConfig.OTP_NUMBER;
+        const val otpsender = BuildConfig.OTP_NUMBER
         lateinit var editTextPhone: TextView
         lateinit var editTextTextMultiLine: TextView
         lateinit var button:Button
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        var keyHash = Utility.getKeyHash(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val noty = NotyBuilder()
 
         editTextPhone = findViewById(R.id.editTextPhone)
         editTextTextMultiLine = findViewById(R.id.editTextTextMultiLine)
@@ -42,10 +38,14 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.RECEIVE_SMS,Manifest.permission.SEND_SMS),111)
         }
         else{
-            receiveMsg()
+            val flag = receiveMsg()
+            if(flag){
+                noty.sendNotification(this,"OTPForward","OTP Send SUCCESS")
+            }
         }
         button.setOnClickListener {
             sendSMS(editTextTextMultiLine.text.toString())
+            noty.sendNotification(this,"OTPForward","OTP Send SUCCESS")
         }
     }
 
@@ -72,26 +72,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun receiveMsg() {
+    private fun receiveMsg(): Boolean {
+        var flag = false
         var br = object:BroadcastReceiver(){
             override fun onReceive(p0: Context?, p1: Intent?) {
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
                     for(sms in Telephony.Sms.Intents.getMessagesFromIntent(p1)){
-                        fun String.show() = Toast.makeText(applicationContext, this, Toast.LENGTH_LONG).show()
                         if(otpsender.equals(sms.getOriginatingAddress())){
-                            //sms.displayMessageBody.show()
                             editTextPhone.setText(sms.originatingAddress)
                             editTextTextMultiLine.setText(sms.displayMessageBody)
                             sendSMS(sms.displayMessageBody)
-                        }
-                        //if문 제대로 들어갔는지 확인용
-                        else{
-                            sms.displayOriginatingAddress.show()
+                            flag = true
                         }
                     }
                 }
             }
         }
         registerReceiver(br, IntentFilter("android.provider.Telephony.SMS_RECEIVED"))
+        return flag
     }
 }

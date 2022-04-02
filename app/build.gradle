@@ -19,6 +19,9 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         buildConfigField "String", "OTP_NUMBER", properties['OTP_NUMBER']
         buildConfigField "String", "OTP_DEST", properties['OTP_DEST']
+        buildConfigField "String", "CHANNEL_ID", properties['ch_id']
+        buildConfigField "String", "CHANNEL_NAME", properties['ch_name']
+        buildConfigField "Integer", "NOTIFICATION_ID", properties['noti_id']
     }
 
     buildTypes {
