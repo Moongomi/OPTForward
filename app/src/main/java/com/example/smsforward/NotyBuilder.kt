@@ -27,6 +27,7 @@ class NotyBuilder {
             .setContentText(body)
 
         manager.notify(NOTIFICATION_ID, notificationBuilder.build())
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

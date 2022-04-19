@@ -1,22 +1,27 @@
 package com.example.smsforward
 
 import android.Manifest
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.provider.Telephony
 import android.telephony.SmsManager
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.example.smsforward.BuildConfig.NOTIFICATION_ID
 
 class MainActivity : AppCompatActivity() {
     companion object{
+        const val ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 2323
         const val otpsender = BuildConfig.OTP_NUMBER
         lateinit var editTextPhone: TextView
         lateinit var editTextTextMultiLine: TextView
@@ -37,6 +42,11 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.RECEIVE_SMS,Manifest.permission.SEND_SMS),111)
         }
+        /*
+        else if(ActivityCompat.checkSelfPermission(this,Manifest.permission.SYSTEM_ALERT_WINDOW) !=PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.SYSTEM_ALERT_WINDOW),2323)
+        }*/
         else{
             val flag = receiveMsg()
             if(flag){
@@ -46,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
             sendSMS(editTextTextMultiLine.text.toString())
             noty.sendNotification(this,"OTPForward","OTP Send SUCCESS")
+
         }
     }
 
@@ -70,6 +81,11 @@ class MainActivity : AppCompatActivity() {
         if(requestCode==111 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
             receiveMsg()
         }
+        /*
+        if(requestCode==ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+            //receiveMsg()
+            System.out.println("권한 테스트")
+        }*/
     }
 
     private fun receiveMsg(): Boolean {
